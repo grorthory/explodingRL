@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from entity import Actor
 
 class Fighter(BaseComponent):
-    entity: Actor
+    parent: Actor
     def __init__(self, might: int = None, clarity=None, endurance=None, faith=None, grace=None, valor=None):
         self.max_might = might
         self._might = might
@@ -27,10 +27,10 @@ class Fighter(BaseComponent):
     def might(self, value: int) -> None:
         self._might = max(0, min(value, self.max_might))
 
-        if self.entity is not self.engine.player and self._might > 0:
-            self.entity.char = str(self._might)
+        if self.parent is not self.engine.player and self._might > 0:
+            self.parent.char = str(self._might)
             # TODO: find a way to graphically represent Might of 10 or higher
-        if self._might == 0 and self.entity.ai:
+        if self._might == 0 and self.parent.ai:
             self.die()
 
     def reduce_die(self, die) -> None:
@@ -43,19 +43,19 @@ class Fighter(BaseComponent):
             die.downgrade()
 
     def die(self) -> None:
-        if self.engine.player is self.entity:
+        if self.engine.player is self.parent:
             death_message = "You die..."
             death_message_color = color.player_die
             self.engine.event_handler = GameOverEventHandler(self.engine)
         else:
-            death_message = f"The {self.entity.name} dies."
+            death_message = f"The {self.parent.name} dies."
             death_message_color = color.enemy_die
 
-        self.entity.char = "%"
-        self.entity.color = (191, 0, 0)
-        self.entity.blocks_movement = False
-        self.entity.ai = None
-        self.entity.name = f"remains of {self.entity.name}"
-        self.entity.render_order = RenderOrder.CORPSE
+        self.parent.char = "%"
+        self.parent.color = (191, 0, 0)
+        self.parent.blocks_movement = False
+        self.parent.ai = None
+        self.parent.name = f"remains of {self.parent.name}"
+        self.parent.render_order = RenderOrder.CORPSE
 
         self.engine.message_log.add_message(death_message, death_message_color)

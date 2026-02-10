@@ -1,6 +1,8 @@
 from components.ai import HostileEnemy
+from components.consumable import ValorPotion
 from components.fighter import Fighter
-from entity import Actor
+from components.inventory import Inventory
+from entity import Actor, Item
 from dice import Dice
 
 player = Actor(
@@ -13,6 +15,7 @@ player = Actor(
                     faith=Dice(5),
                     grace=Dice(5),
                     valor=Dice(5)),
+    inventory=Inventory(capacity=26),
 )
 
 orc = Actor(
@@ -21,6 +24,7 @@ orc = Actor(
     name="Orc",
     ai_cls=HostileEnemy,
     fighter=Fighter(might=3),
+    inventory=Inventory(capacity=0),
 )
 troll = Actor(
     char="5",
@@ -28,4 +32,12 @@ troll = Actor(
     name="Troll",
     ai_cls=HostileEnemy,
     fighter=Fighter(might=5),
+    inventory=Inventory(capacity=0),
+)
+
+potion_of_valor = Item(
+    char="!",
+    color=(127,0,255),
+    name="Potion of Valor",
+    consumable=ValorPotion()
 )
