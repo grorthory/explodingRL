@@ -1,9 +1,6 @@
-
-
 from __future__ import annotations
-
 from typing import Optional, Tuple, TYPE_CHECKING
-
+import color
 if TYPE_CHECKING:
     from engine import Engine
     from entity import Actor, Entity
@@ -68,6 +65,10 @@ class MeleeAction(ActionWithDirection):
             return  # No entity to attack.
         attacker = self.entity
         player = self.engine.player
+        if attacker is player:
+            attack_color = color.player_atk
+        else:
+            attack_color = color.enemy_atk
 
         # Determine the Might values for the clash
         if attacker is player:
@@ -85,8 +86,8 @@ class MeleeAction(ActionWithDirection):
 
         # Handle outcome
         if result == 0:
-            print(
-                f"{attacker.name.capitalize()} ({attack_might}) ties its clash against {target.name} ({target_might}).")
+            self.engine.message_log.add_message(
+f"{attacker.name.capitalize()} ({attack_might}) ties its clash against {target.name} ({target_might}).", attack_color)
             return
 
         # Identify winner and loser
@@ -103,8 +104,8 @@ class MeleeAction(ActionWithDirection):
         else:
             damage_desc = f"dealing {margin} damage"
 
-        print(f"{winner.name.capitalize()} ({max(attack_might, target_might)}) wins the clash against "
-              f"{loser.name} ({min(attack_might, target_might)}), {damage_desc}.")
+        self.engine.message_log.add_message(f"{winner.name.capitalize()} ({max(attack_might, target_might)}) wins the clash against "
+              f"{loser.name} ({min(attack_might, target_might)}), {damage_desc}.", attack_color)
 
         # Apply damage to loser
         if loser is player:
