@@ -33,6 +33,11 @@ class Fighter(BaseComponent):
         if self._might == 0 and self.parent.ai:
             self.die()
 
+    def take_damage(self, amount: int):
+        if self is self.engine.player.fighter:
+            self.reduce_die(self.valor)
+        else:
+            self.might -= amount
     def reduce_die(self, die) -> None:
         if die is None:
             return

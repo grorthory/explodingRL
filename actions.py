@@ -153,10 +153,7 @@ f"{attacker.name.capitalize()} ({attack_might}) ties its clash against {target.n
               f"{loser.name} ({min(attack_might, target_might)}), {damage_desc}.", attack_color)
 
         # Apply damage to loser
-        if loser is player:
-            loser.fighter.reduce_die(loser.fighter.valor)
-        else:
-            loser.fighter.might -= margin
+        loser.fighter.take_damage(margin)
 
 class MovementAction(ActionWithDirection):
 
