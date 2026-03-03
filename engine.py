@@ -46,5 +46,5 @@ class Engine:
         console.print(
             x=1,
             y=47,
-            string=f"Valor: d{self.player.fighter.valor.chain[self.player.fighter.valor.index]}",
+            string=f"Might: d{self.player.fighter.die.chain[self.player.fighter.die.index]} Luck: {self.player.fighter.luck}",
         )

@@ -103,56 +103,73 @@ class ActionWithDirection(Action):
     def perform(self) -> None:
         raise NotImplementedError()
 
+
 class MeleeAction(ActionWithDirection):
     def perform(self) -> None:
         target = self.target_actor
         if not target:
             raise exceptions.Impossible("Nothing to attack.")
+
         attacker = self.entity
         player = self.engine.player
-        if attacker is player:
-            attack_color = color.player_atk
-        else:
-            attack_color = color.enemy_atk
 
-        # Determine the Might values for the clash
+        atk_detail = ""
+        def_detail = ""
+
+        # --- 1. CALCULATE ATTACKER MIGHT ---
         if attacker is player:
-            attack_might = attacker.fighter.valor.roll()
-            target_might = target.fighter.might
-        elif target is player:
-            attack_might = attacker.fighter.might
-            target_might = target.fighter.valor.roll()
+            # Overkill threshold: Enemy Might x2
+            threshold = target.fighter.might + target.fighter.might
+            val, new_luck, history = attacker.fighter.die.luckyroll(attacker.fighter.luck, threshold)
+            attacker.fighter.luck = new_luck
+            attack_might = val
+            atk_detail = f"[{' + '.join(history)}]"
         else:
-            # NPC vs NPC (if applicable)
             attack_might = attacker.fighter.might
+
+        # --- 2. CALCULATE DEFENDER MIGHT ---
+        if target is player:
+            # Overkill threshold: Attacker Might x2
+            threshold = attacker.fighter.might + attacker.fighter.might
+            val, new_luck, history = target.fighter.die.luckyroll(target.fighter.luck, threshold)
+            target.fighter.luck = new_luck
+            target_might = val
+            def_detail = f"[{' + '.join(history)}]"
+        else:
             target_might = target.fighter.might
 
+        # --- 3. PREPARE DISPLAY STRINGS ---
+        # We build these here so they can be used for both ties and wins
+        atk_str = f"{attacker.name.capitalize()} ({attack_might}{atk_detail})"
+        def_str = f"{target.name} ({target_might}{def_detail})"
+
+        # --- 4. RESOLVE CLASH ---
         result = attack_might - target_might
+        attack_color = color.player_atk if attacker is player else color.enemy_atk
 
-        # Handle outcome
         if result == 0:
+            # Now ties include the full history strings!
             self.engine.message_log.add_message(
-f"{attacker.name.capitalize()} ({attack_might}) ties its clash against {target.name} ({target_might}).", attack_color)
+                f"{atk_str} ties against {def_str}.", color.white
+            )
             return
 
-        # Identify winner and loser
+        # Determine winner/loser for non-ties
         if result > 0:
-            winner, loser = attacker, target
+            winner_name = attacker.name
+            loser = target
             margin = result
         else:
-            winner, loser = target, attacker
+            winner_name = target.name
+            loser = attacker
             margin = abs(result)
 
-        # Describe damage.
-        if loser is player:
-            damage_desc = "damaging their Valor"
-        else:
-            damage_desc = f"dealing {margin} damage"
+        # Final victory message
+        self.engine.message_log.add_message(
+            f"{atk_str} vs {def_str}: {winner_name.capitalize()} wins by {margin}!",
+            attack_color
+        )
 
-        self.engine.message_log.add_message(f"{winner.name.capitalize()} ({max(attack_might, target_might)}) wins the clash against "
-              f"{loser.name} ({min(attack_might, target_might)}), {damage_desc}.", attack_color)
-
-        # Apply damage to loser
         loser.fighter.take_damage(margin)
 
 class MovementAction(ActionWithDirection):

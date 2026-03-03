@@ -69,18 +69,18 @@ class ConfusionConsumable(Consumable):
         )
         self.consume()
 
-class ValorPotion(Consumable):
+class MightPotion(Consumable):
     def activate(self, action: actions.ItemAction) -> None:
         consumer = action.entity
-        if consumer.fighter.valor.index < 6:
+        if consumer.fighter.die.index < 6:
             self.engine.message_log.add_message(
-                f"You consume the {self.parent.name}. Your Valor increases!",
+                f"You consume the {self.parent.name}. Your Might increases!",
                 color.upgrade,
             )
-            consumer.fighter.valor.index += 1
+            consumer.fighter.die.index += 1
             self.consume()
         else:
-            raise Impossible(f"Your Valor is already at its peak.")
+            raise Impossible(f"Your might is already at its peak.")
 
 class DarkBoltScroll(Consumable):
     def __init__(self, damage: int, maximum_range: int):

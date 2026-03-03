@@ -10,14 +10,12 @@ if TYPE_CHECKING:
 
 class Fighter(BaseComponent):
     parent: Actor
-    def __init__(self, might: int = None, clarity=None, endurance=None, faith=None, grace=None, valor=None):
+    def __init__(self, might: int = None, die=None, die_max=None, luck: int = None):
         self.max_might = might
         self._might = might
-        self.clarity = clarity
-        self.endurance = endurance
-        self.faith = faith
-        self.grace = grace
-        self.valor = valor
+        self.die = die
+        self.die_max = die_max
+        self.luck = luck
 
     @property
     def might(self) -> int:
@@ -31,11 +29,11 @@ class Fighter(BaseComponent):
             self.parent.char = str(self._might)
             # TODO: find a way to graphically represent Might of 10 or higher
         if self._might == 0 and self.parent.ai:
-            self.die()
+            self.death()
 
     def take_damage(self, amount: int):
         if self is self.engine.player.fighter:
-            self.reduce_die(self.valor)
+            self.reduce_die(self.die)
         else:
             self.might -= amount
     def reduce_die(self, die) -> None:
@@ -43,11 +41,11 @@ class Fighter(BaseComponent):
             return
 
         if die.chain[die.index] <= 2:
-            self.die()
+            self.death()
         else:
             die.downgrade()
 
-    def die(self) -> None:
+    def death(self) -> None:
         if self.engine.player is self.parent:
             death_message = "You die..."
             death_message_color = color.player_die

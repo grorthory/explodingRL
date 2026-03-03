@@ -51,9 +51,9 @@ def place_entities(
 
         if not any(entity.x == x and entity.y == y for entity in dungeon.entities):
             if random.random() < 0.8:
-                entity_factories.orc.spawn(dungeon, x, y)
+                entity_factories.rat.spawn(dungeon, x, y)
             else:
-                entity_factories.troll.spawn(dungeon, x, y)
+                entity_factories.goblin.spawn(dungeon, x, y)
 
     for i in range(number_of_items):
         x = random.randint(room.x1 + 1, room.x2 - 1)
@@ -63,7 +63,7 @@ def place_entities(
             item_chance = random.random()
 
             if item_chance < 0.7:
-                entity_factories.potion_of_valor.spawn(dungeon, x, y)
+                entity_factories.potion_of_might.spawn(dungeon, x, y)
             elif item_chance < 0.8:
                 entity_factories.fireball_scroll.spawn(dungeon, x, y)
             elif item_chance < 0.9:

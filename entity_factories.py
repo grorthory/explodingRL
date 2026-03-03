@@ -10,26 +10,23 @@ player = Actor(
     color=(255, 255, 255),
     name="Player",
     ai_cls=HostileEnemy,
-    fighter=Fighter(clarity=Dice(2),
-                    endurance=Dice(2),
-                    faith=Dice(2),
-                    grace=Dice(2),
-                    valor=Dice(2)),
+    fighter=Fighter(die=Dice(0), die_max=Dice(0), luck = 1),
     inventory=Inventory(capacity=26),
 )
 
-orc = Actor(
+rat = Actor(
     char="2",
     color=(63, 127, 63),
-    name="Goblin",
+    name="Rat",
     ai_cls=HostileEnemy,
     fighter=Fighter(might=2),
     inventory=Inventory(capacity=0),
 )
-troll = Actor(
+
+goblin = Actor(
     char="3",
-    color=(0, 127, 0),
-    name="Orc",
+    color=(63, 127, 63),
+    name="Goblin",
     ai_cls=HostileEnemy,
     fighter=Fighter(might=3),
     inventory=Inventory(capacity=0),
@@ -42,11 +39,11 @@ confusion_scroll = Item(
     consumable=consumable.ConfusionConsumable(number_of_turns=10),
 )
 
-potion_of_valor = Item(
+potion_of_might = Item(
     char="!",
     color=(127,0,255),
-    name="Potion of Valor",
-    consumable=consumable.ValorPotion()
+    name="Potion of Might",
+    consumable=consumable.MightPotion()
 )
 
 darkbolt_scroll=Item(
